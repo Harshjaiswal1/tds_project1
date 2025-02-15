@@ -1,0 +1,418 @@
+# import sqlite3
+# import subprocess
+# from dateutil.parser import parse
+# from datetime import datetime
+# import json
+# from pathlib import Path
+# import os
+# import requests
+# from scipy.spatial.distance import cosine
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# AIPROXY_TOKEN = os.getenv('AIPROXY_TOKEN')
+
+
+# def A1(email="23f1001995@ds.study.iitm.ac.in"):
+#     try:
+#         process = subprocess.Popen(
+#             ["uv", "run", "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py", email],
+#             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+#         )
+#         stdout, stderr = process.communicate()
+#         if process.returncode != 0:
+#             raise HTTPException(status_code=500, detail=f"Error: {stderr}")
+#         return stdout
+#     except subprocess.CalledProcessError as e:
+#         raise HTTPException(status_code=500, detail=f"Error: {e.stderr}")
+
+# def A2(prettier_version="prettier@3.4.2", filename="/data/format.md"):
+#     command = [r"C:\Program Files\nodejs\npx.cmd", prettier_version, "--write", filename]
+#     try:
+#         subprocess.run(command, check=True)
+#         print("Prettier executed successfully.")
+#     except subprocess.CalledProcessError as e:
+#         print(f"An error occurred: {e}")
+
+# def A3(filename='/data/dates.txt', targetfile='/data/dates-wednesdays.txt', weekday=2):
+#     input_file = filename
+#     output_file = targetfile
+#     weekday = weekday
+#     weekday_count = 0
+
+#     with open(input_file, 'r') as file:
+#         weekday_count = sum(1 for date in file if parse(date).weekday() == int(weekday)-1)
+
+#     with open(output_file, 'w') as file:
+#         file.write(str(weekday_count))
+
+# def A4(filename="/data/contacts.json", targetfile="/data/contacts-sorted.json"):
+#     # Load the contacts from the JSON file
+#     with open(filename, 'r') as file:
+#         contacts = json.load(file)
+
+#     # Sort the contacts by last_name and then by first_name
+#     sorted_contacts = sorted(contacts, key=lambda x: (x['last_name'], x['first_name']))
+
+#     # Write the sorted contacts to the new JSON file
+#     with open(targetfile, 'w') as file:
+#         json.dump(sorted_contacts, file, indent=4)
+
+# # def A5(log_dir_path='/data/logs', output_file_path='/data/logs-recent.txt', num_files=10):
+# #     log_dir = Path(log_dir_path)
+# #     output_file = Path(output_file_path)
+
+# #     # Get list of .log files sorted by modification time (most recent first)
+# #     log_files = sorted(log_dir.glob('*.log'), key=os.path.getmtime, reverse=True)[:num_files]
+
+# #     # Read first line of each file and write to the output file
+# #     with output_file.open('w') as f_out:
+# #         for log_file in log_files:
+# #             with log_file.open('r') as f_in:
+# #                 first_line = f_in.readline().strip()
+# #                 f_out.write(f"{first_line}\n")
+# def A5(log_dir_path='/data/logs', output_file_path='/data/logs-recent.txt', num_files=10):
+#     log_dir = Path(log_dir_path)
+#     output_file = Path(output_file_path)
+
+#     # Get list of .log files sorted by modification time (most recent first)
+#     log_files = sorted(log_dir.glob('*.log'), key=os.path.getmtime, reverse=True)[:num_files]
+
+#     # Read first line of each file and write to the output file
+#     with output_file.open('w') as f_out:
+#         for log_file in log_files:
+#             with log_file.open('r') as f_in:
+#                 first_line = f_in.readline().strip()
+#                 f_out.write(f"{first_line}\n")
+
+#     return {"message": "Processed 10 most recent logs successfully."}
+
+
+# def A6(doc_dir_path='/data/docs', output_file_path='/data/docs/index.json'):
+#     docs_dir = doc_dir_path
+#     output_file = output_file_path
+#     index_data = {}
+
+#     # Walk through all files in the docs directory
+#     for root, _, files in os.walk(docs_dir):
+#         for file in files:
+#             if file.endswith('.md'):
+#                 file_path = os.path.join(root, file)
+#                 # Read the file and find the first occurrence of an H1
+#                 with open(file_path, 'r', encoding='utf-8') as f:
+#                     for line in f:
+#                         if line.startswith('# '):
+#                             # Extract the title text after '# '
+#                             title = line[2:].strip()
+#                             # Get the relative path without the prefix
+#                             relative_path = os.path.relpath(file_path, docs_dir).replace('\\', '/')
+#                             index_data[relative_path] = title
+#                             break  # Stop after the first H1
+#     # Write the index data to index.json
+#     with open(output_file, 'w', encoding='utf-8') as f:
+#         json.dump(index_data, f, indent=4)
+
+# def A7(filename='/data/email.txt', output_file='/data/email-sender.txt'):
+#     # Read the content of the email
+#     with open(filename, 'r') as file:
+#         email_content = file.readlines()
+
+#     sender_email = "sujay@gmail.com"
+#     for line in email_content:
+#         if "From" == line[:4]:
+#             sender_email = (line.strip().split(" ")[-1]).replace("<", "").replace(">", "")
+#             break
+
+#     # Write the email address to the output file
+#     with open(output_file, 'w') as file:
+#         file.write(sender_email)
+
+# import base64
+# def png_to_base64(image_path):
+#     with open(image_path, "rb") as image_file):
+#         base64_string = base64.b64encode(image_file.read()).decode('utf-8')
+#     return base64_string
+
+# def A8(filename='/data/credit_card.txt', image_path='/data/credit_card.png'):
+#     # Construct the request body for the AIProxy call
+#     body = {
+#         "model": "gpt-4o-mini",
+#         "messages": [
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {
+#                         "type": "text",
+#                         "text": "There is 8 or more digit number is there in this image, with space after every 4 digit, only extract the those digit number without spaces and return just the number without any other characters"
+#                     },
+#                     {
+#                         "type": "image_url",
+#                         "image_url": {
+#                             "url": f"data:image/png;base64,{png_to_base64(image_path)}"
+#                         }
+#                     }
+#                 ]
+#             }
+#         ]
+#     }
+
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Authorization": f"Bearer {AIPROXY_TOKEN}"
+#     }
+
+#     # Make the request to the AIProxy service
+#     response = requests.post("http://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
+#                              headers=headers, data=json.dumps(body))
+
+#     # Extract the credit card number from the response
+#     result = response.json()
+#     card_number = result['choices'][0]['message']['content'].replace(" ", "")
+
+#     # Write the extracted card number to the output file
+#     with open(filename, 'w') as file:
+#         file.write(card_number)
+
+# def get_embedding(text):
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Authorization": f"Bearer {AIPROXY_TOKEN}"
+#     }
+#     data = {
+#         "model": "text-embedding-3-small",
+#         "input": [text]
+#     }
+#     response = requests.post("http://aiproxy.sanand.workers.dev/openai/v1/embeddings", headers=headers, data=json.dumps(data))
+#     response.raise_for_status()
+#     return response.json()["data"][0]["embedding"]
+
+# def A9(filename='/data/comments.txt', output_filename='/data/comments-similar.txt'):
+#     # Read comments
+#     with open(filename, 'r') as f:
+#         comments = [line.strip() for line in f.readlines()]
+
+#     # Get embeddings for all comments
+#     embeddings = [get_embedding(comment) for comment in comments]
+
+#     # Find the most similar pair
+#     min_distance = float('inf')
+#     most_similar = (None, None)
+
+#     for i in range(len(comments)):
+#         for j in range(i + 1, len(comments)):
+#             distance = cosine(embeddings[i], embeddings[j])
+#             if distance < min_distance:
+#                 min_distance = distance
+#                 most_similar = (comments[i], comments[j])
+
+#     # Write the most similar pair to file
+#     with open(output_filename, 'w') as f:
+#         f.write(most_similar[0] + '\n')
+#         f.write(most_similar[1] + '\n')
+
+# def A10(filename='/data/ticket-sales.db', output_filename='/data/ticket-sales-gold.txt', query="SELECT SUM(units * price) FROM tickets WHERE type = 'Gold'"):
+#     # Connect to the SQLite database
+#     conn = sqlite3.connect(filename)
+#     cursor = conn.cursor()
+
+#     # Calculate the total sales for the "Gold" ticket type
+#     cursor.execute(query)
+#     total_sales = cursor.fetchone()[0]
+
+#     # If there are no sales, set total_sales to 0
+#     total_sales = total_sales if total_sales else 0
+
+#     # Write the total sales to the file
+#     with open(output_filename, 'w') as file:
+#         file.write(str(total_sales))
+
+#     # Close the database connection
+#     conn.close()
+
+
+import os
+import json
+import requests
+import base64
+import sqlite3
+import datetime
+from pathlib import Path
+from PIL import Image
+import numpy as np
+
+# Utility to check if file is inside /data
+def is_valid_path(file_path):
+    return file_path.startswith("/data/")
+
+# ✅ A1: Install uv (if required) and run datagen.py
+def A1(user_email):
+    os.system(f"uv run datagen.py {user_email}")
+    return {"message": f"A1 Task executed successfully for {user_email}"}
+
+# ✅ A2: Format /data/format.md using Prettier
+def A2():
+    os.system("npx prettier --write /data/format.md")
+    return {"message": "A2 Task executed successfully"}
+
+# ✅ A3: Count Wednesdays in /data/dates.txt
+def A3():
+    dates_file = "/data/dates.txt"
+    output_file = "/data/dates-wednesdays.txt"
+
+    with open(dates_file, "r") as f:
+        dates = f.readlines()
+
+    wednesdays = sum(1 for date in dates if datetime.datetime.strptime(date.strip(), "%Y-%m-%d").weekday() == 2)
+
+    with open(output_file, "w") as f:
+        f.write(str(wednesdays))
+
+    return {"message": "A3 Task executed successfully"}
+
+# ✅ A4: Sort contacts in /data/contacts.json
+def A4():
+    contacts_file = "/data/contacts.json"
+    output_file = "/data/contacts-sorted.json"
+
+    with open(contacts_file, "r") as f:
+        contacts = json.load(f)
+
+    contacts.sort(key=lambda x: (x["last_name"], x["first_name"]))
+
+    with open(output_file, "w") as f:
+        json.dump(contacts, f, indent=4)
+
+    return {"message": "A4 Task executed successfully"}
+
+# ✅ A5: Get first line of 10 most recent .log files
+def A5():
+    log_dir = Path("/data/logs")
+    output_file = "/data/logs-recent.txt"
+
+    log_files = sorted(log_dir.glob("*.log"), key=os.path.getmtime, reverse=True)[:10]
+
+    with open(output_file, "w") as f_out:
+        for log_file in log_files:
+            with log_file.open("r") as f_in:
+                first_line = f_in.readline().strip()
+                f_out.write(f"{first_line}\n")
+
+    return {"message": "A5 Task executed successfully"}
+
+# ✅ A6: Extract first H1 title from .md files
+def A6():
+    docs_dir = Path("/data/docs")
+    output_file = "/data/docs/index.json"
+    index_data = {}
+
+    for file in docs_dir.rglob("*.md"):
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("# "):  
+                    index_data[file.relative_to(docs_dir).as_posix()] = line.strip()[2:]
+                    break  
+
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(index_data, f, indent=4)
+
+    return {"message": "A6 Task executed successfully"}
+
+# ✅ A7: Extract sender's email from /data/email.txt using LLM
+def A7():
+    email_file = "/data/email.txt"
+    output_file = "/data/email-sender.txt"
+
+    with open(email_file, "r") as f:
+        email_text = f.read()
+
+    response = requests.post(
+        "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {os.getenv('AIPROXY_TOKEN')}"},
+        json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": f"Extract sender email: {email_text}"}]},
+    )
+
+    email_address = response.json()["choices"][0]["message"]["content"]
+
+    with open(output_file, "w") as f:
+        f.write(email_address)
+
+    return {"message": "A7 Task executed successfully"}
+
+# ✅ A8: Extract credit card number from image using LLM
+def A8():
+    image_path = "/data/credit_card.png"
+    output_file = "/data/credit-card.txt"
+
+    def image_to_base64(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode("utf-8")
+
+    payload = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Extract the credit card number from this image"},
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_to_base64(image_path)}"}}
+                ]
+            }
+        ]
+    }
+
+    response = requests.post(
+        "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {os.getenv('AIPROXY_TOKEN')}"},
+        json=payload,
+    )
+
+    card_number = response.json()["choices"][0]["message"]["content"].replace(" ", "")
+
+    with open(output_file, "w") as f:
+        f.write(card_number)
+
+    return {"message": "A8 Task executed successfully"}
+
+# ✅ A9: Find most similar comments using embeddings
+def A9():
+    comments_file = "/data/comments.txt"
+    output_file = "/data/comments-similar.txt"
+
+    with open(comments_file, "r") as f:
+        comments = f.readlines()
+
+    def get_embedding(text):
+        response = requests.post(
+            "http://aiproxy.sanand.workers.dev/openai/v1/embeddings",
+            headers={"Authorization": f"Bearer {os.getenv('AIPROXY_TOKEN')}"},
+            json={"model": "text-embedding-3-small", "input": text},
+        )
+        return response.json()["data"][0]["embedding"]
+
+    embeddings = [get_embedding(comment.strip()) for comment in comments]
+    similarity_matrix = np.dot(embeddings, np.transpose(embeddings))
+    np.fill_diagonal(similarity_matrix, -np.inf)
+
+    i, j = np.unravel_index(np.argmax(similarity_matrix), similarity_matrix.shape)
+
+    with open(output_file, "w") as f:
+        f.write(comments[i].strip() + "\n" + comments[j].strip())
+
+    return {"message": "A9 Task executed successfully"}
+
+# ✅ A10: Compute total sales for "Gold" tickets from SQLite
+def A10():
+    db_file = "/data/ticket-sales.db"
+    output_file = "/data/ticket-sales-gold.txt"
+
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute("SELECT SUM(units * price) FROM tickets WHERE type='Gold'")
+    total_sales = cursor.fetchone()[0] or 0
+    conn.close()
+
+    with open(output_file, "w") as f:
+        f.write(str(total_sales))
+
+    return {"message": "A10 Task executed successfully"}
